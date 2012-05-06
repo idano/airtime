@@ -4,13 +4,28 @@
 # month
 import string
 import datetime
+from collections import defaultdict
 
 
-logfile = "homesweethomeLog.txt"
+logfile = "/var/log/messages"
 
 
 fo = open(logfile)
+#results = defaultdict(list)
 results = list()
+
+macnames = dict()
+
+macnames['00:23:6c:88:f5:9f'] = 'Tracy Macbook'
+macnames['00:11:24:c5:b9:8a'] = 'Emmanuel Macbook'
+macnames['58:b0:35:77:08:4b'] = 'Manuel Macbook'
+macnames['98:0c:82:34:11:eb'] = 'Manuel Inspire'
+macnames['40:fc:89:3c:51:35'] = 'Manuel Atrix'
+macnames['00:22:4c:03:a1:9e'] = 'Emmanuel Wii'
+macnames['90:84:0d:82:25:3f'] = 'Tracy iPhone'
+
+
+
 
 # takes a list of words of the following format
 # ['Jul', '02', '22:29:30']
@@ -32,14 +47,14 @@ if __name__ == "__main__":
     # 'Jul 02 21:21:31\tSeverity:5\tAssociated with station 58:b0:35:77:08:4b\n'
     total = datetime.datetime.min
     timeused = datetime.datetime.min
-    dailytotals = {}
+    dailytotals = defaultdict(dict)
     action = ''
     
     # filter out the lines concerning association and disassociation of Es
     # computer
-    print 'starting'
     for line in fo:
-        if "sociate" in line and "00:11:24:c5:b9:8a" in line:
+        #if "sociate" in line and "00:11:24:c5:b9:8a" in line:
+        if "sociate" in line:
             results.append(line)
 
     starttime = datetime.datetime.min
@@ -49,10 +64,12 @@ if __name__ == "__main__":
         day = words[1]
         time = words[2]
         logtime = str2date(month, day, time)
-        macAddr = words[7]
+        macAddr = words[9]
         # if this day has not been initialized, do it
-        if month+day not in dailytotals:
-            dailytotals[month+day] = datetime.datetime.min
+        if macAddr not in dailytotals:
+            dailytotals[macAddr] = dict()
+        if month+day not in dailytotals[macAddr]:
+            dailytotals[macAddr][month+day] = datetime.datetime.min
         if "Associated" in line:
             action = "associated"
             starttime = logtime 
@@ -60,10 +77,11 @@ if __name__ == "__main__":
             action = "disassociated"
             if starttime != datetime.datetime.min:
                 timeused = logtime - starttime
-                dailytotals[month+day] += timeused 
+                dailytotals[macAddr][month+day] += timeused 
     if action == "associated":
         timeused = datetime.datetime.now() - starttime
-        dailytotals[month+day] += timeused
+        dailytotals[macAddr][month+day] += timeused
 
-    for day in dailytotals:
-        print day, dailytotals[day]
+    for mac in dailytotals:
+      for day in dailytotals[mac]:
+        print macnames[mac], day, dailytotals[mac][day]
