@@ -16,13 +16,13 @@ results = list()
 
 macnames = dict()
 
-macnames['00:23:6c:88:f5:9f'] = 'Tracy Macbook'
 macnames['00:11:24:c5:b9:8a'] = 'Emmanuel Macbook'
+macnames['00:22:4c:03:a1:9e'] = 'Emmanuel Wii'
 macnames['58:b0:35:77:08:4b'] = 'Manuel Macbook'
 macnames['98:0c:82:34:11:eb'] = 'Manuel Inspire'
 macnames['40:fc:89:3c:51:35'] = 'Manuel Atrix'
-macnames['00:22:4c:03:a1:9e'] = 'Emmanuel Wii'
 macnames['90:84:0d:82:25:3f'] = 'Tracy iPhone'
+macnames['00:23:6c:88:f5:9f'] = 'Tracy Macbook'
 
 
 
@@ -54,7 +54,7 @@ if __name__ == "__main__":
     # computer
     for line in fo:
         #if "sociate" in line and "00:11:24:c5:b9:8a" in line:
-        if "sociate" in line:
+        if " Associated with station " in line or " Disassociated with station " in line:
             results.append(line)
 
     starttime = datetime.datetime.min
@@ -83,5 +83,10 @@ if __name__ == "__main__":
         dailytotals[macAddr][month+day] += timeused
 
     for mac in dailytotals:
+      try:
+        print macnames[mac]+":"
+      except:
+        print mac+":"
       for day in dailytotals[mac]:
-        print macnames[mac], day, dailytotals[mac][day]
+        print day, dailytotals[mac][day]
+      print ""
